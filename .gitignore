@@ -4,6 +4,9 @@ apikey.txt
 # Gevoerd gesprek
 gesprek.txt
 
+# Bestand met fouten
+errors.txt
+
 # Virtuele omgeving
 ve/*
 
