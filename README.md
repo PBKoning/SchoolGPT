@@ -29,4 +29,4 @@ Het programma kent 2 tekstbestanden waarmee de werking wordt beïnvloed:
 
 5-3-2023: Eerste werkende versie geüploaded
 
-7-3-2023: Programma heeft nu multithreading, waardoor het nie meer lijkt te bevriezen. Veel commentaar toegevoegd en fouten worden nu opgeslagen in een error logfile.
+7-3-2023: Programma heeft nu multithreading, waardoor het niet meer lijkt te bevriezen. Veel commentaar toegevoegd en fouten worden nu opgeslagen in een error logfile.
