@@ -13,7 +13,7 @@ Om dit programma te gebruiken heb je nodig:
 
   **LET OP!!! Een apikey opslaan in een tekstbestand is uiteraard zeer onveilig. Gebruik dit Python programma dus alleen zelf, of onder toezicht.**
 
-- De pythonmodule openai
+- De pythonmodule **openai**
 
   Installeer deze met het commando "pip install openai"
 
@@ -30,3 +30,5 @@ Het programma kent 2 tekstbestanden waarmee de werking wordt beïnvloed:
 5-3-2023: Eerste werkende versie geüploaded
 
 7-3-2023: Programma heeft nu multithreading, waardoor het niet meer lijkt te bevriezen. Veel commentaar toegevoegd en fouten worden nu opgeslagen in een error logfile.
+
+9-3-2023: Data staat nu in een aparte directory. Foutafhandeling wanneer de API-key niet klopt of bestanden niet kunnen worden geladen.
