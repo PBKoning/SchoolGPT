@@ -26,9 +26,12 @@ Het programma kent 2 tekstbestanden waarmee de werking wordt beïnvloed:
 
   Deze tekst wordt voor elke ingevoerde vraag gezet, zodat het antwoord wordt beïnvloed.
 
+**Disclaimer: gebruik van SchoolGPT, zowel de Python-versie als de Windows executable, is op eigen risico.**
+
 
 5-3-2023: Eerste werkende versie geüploaded
 
 7-3-2023: Programma heeft nu multithreading, waardoor het niet meer lijkt te bevriezen. Veel commentaar toegevoegd en fouten worden nu opgeslagen in een error logfile.
 
 9-3-2023: Data staat nu in een aparte directory. Foutafhandeling wanneer de API-key niet klopt of bestanden niet kunnen worden geladen.
+9-3-2023: Windows executable toegevoegd (gemaakt met https://pypi.org/project/auto-py-to-exe/)

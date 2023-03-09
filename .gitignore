@@ -7,6 +7,9 @@ data/gesprek.txt
 # Bestand met fouten
 data/errors.txt
 
+# Directory voor auto-py-to-exe
+output/*
+
 # Virtuele omgeving
 ve/*
 
