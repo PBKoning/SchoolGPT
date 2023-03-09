@@ -1,11 +1,11 @@
 # Bestand met de apikey
-apikey.txt
+data/apikey.txt
 
 # Gevoerd gesprek
-gesprek.txt
+data/gesprek.txt
 
 # Bestand met fouten
-errors.txt
+data/errors.txt
 
 # Virtuele omgeving
 ve/*

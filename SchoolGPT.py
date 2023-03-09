@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 from datetime import datetime
-import os, time, openai
+import os, time, openai, sys
 import threading as thr
 
 
@@ -10,8 +10,8 @@ class Application(tk.Frame):
     # Variabelen
     content = "" # Dit is de vraag die wordt gesteld aan chatgpt
 
-    logfile = "gesprek.txt" # Bestand waar het gesprek in wordt opgeslagen
-    errorfile = "errors.txt" # Bestand waarin de errors worden opgeslagen
+    logfile = "data/gesprek.txt" # Bestand waar het gesprek in wordt opgeslagen
+    errorfile = "data/errors.txt" # Bestand waarin de errors worden opgeslagen
     fontgrootte = 18
     
     messages = [] # Slaat het gesprek op voor follow up questions
@@ -24,32 +24,60 @@ class Application(tk.Frame):
     ready_for_next_question = False # Kan de volgende vraag worden gesteld?
     init_chatgpt_flag = False # Wordt ChatGPT (opnieuw) geïnitialiseerd
 
-    # Lees de chaptgpt init tekst in
-    file_name = "chatgpt_init_tekst.txt"  
-    t = ""
-    with open(file_name, "r") as f:   
-        for line in f: 
-            t = t + line
-    chatgpt_init_tekst = t    
-    
-    # lees de chatgpt tekst voor elke vraag in
-    file_name = "chatgpt_tekst_voor_vraag.txt"  
-    t = ""
-    with open(file_name, "r") as f:   
-        for line in f: 
-            t = t + line    
-    chatgpt_tekst_voor_vraag = t
-    
+    # Bestanden inlezen en opslaan in variabelen
 
-    # Lees de apikey in
-    file_name = "apikey.txt"  
-    t = ""
-    with open(file_name, "r") as f:   
-        for line in f: 
-            if t == "":
-                t = line.rstrip()
-    openai.api_key = t
+    try:
+        # Lees de chaptgpt init tekst in
+        file_name = "data/chatgpt_init_tekst.txt"  
+        t = ""
+        with open(file_name, "r") as f:   
+            for line in f: 
+                t = t + line
+        chatgpt_init_tekst = t    
+        #print(t)    
+    except Exception as e:
+        # Sla de fout op in een logbestand
+        print(f"\nError: kon {file_name} niet laden.\n")
+        file_name = errorfile
+        with open(file_name, "a", encoding='utf-8') as f: 
+            f.write(str(e)+ "\n\n")  
+        sys.exit()    
 
+    
+    try:
+        # lees de chatgpt tekst voor elke vraag in
+        file_name = "data/chatgpt_tekst_voor_vraag.txt"  
+        t = ""
+        with open(file_name, "r") as f:   
+            for line in f: 
+                t = t + line    
+        chatgpt_tekst_voor_vraag = t
+        #print(t)
+    except Exception as e:
+        # Sla de fout op in een logbestand
+        print(f"\nError: kon {file_name} niet laden.\n")
+        file_name = errorfile
+        with open(file_name, "a", encoding='utf-8') as f: 
+            f.write(str(e)+ "\n\n")  
+        sys.exit()      
+
+    try:
+        # Lees de apikey in
+        file_name = "data/apikey.txt"  
+        t = ""
+        with open(file_name, "r") as f:   
+            for line in f: 
+                if t == "":
+                    t = line.rstrip()
+        openai.api_key = t
+        #print(t)
+    except Exception as e:
+        # Sla de fout op in een logbestand
+        print(f"\nError: kon {file_name} niet laden.\n")
+        file_name = errorfile
+        with open(file_name, "a", encoding='utf-8') as f: 
+            f.write(str(e)+ "\n\n")  
+        sys.exit()         
     
     def __init__(self, master=None):
         """
@@ -172,8 +200,10 @@ class Application(tk.Frame):
             file_name = self.errorfile
             with open(file_name, "a", encoding='utf-8') as f: 
                 f.write(str(e)+ "\n\n")  
-
-            chat_response = "Er ging iets fout. Misschien is ChatGPT overbelast? Probeer het nog eens."
+            if "Incorrect API key"in str(e) :
+                chat_response = "Er ging iets fout. Klopt de API-key?"
+            else:  
+                chat_response = "Er ging iets fout. Misschien is ChatGPT overbelast? Probeer het nog eens."
 
         # Tekstuitvoer naar het scherm: bij initialisatie van ChatGPT
         if self.init_chatgpt_flag == True:
