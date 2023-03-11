@@ -1,5 +1,6 @@
 # SchoolGPT
 Dit is een schil om ChatGPT heen, gemaakt met Python en Tkinter om ChatGPT geschikt te maken voor het basisonderwijs.
+Er is ook een HTML-versie die een andere code heeft (Javascript), maar vergelijkbaar werkt. 
 
 ## Python-versie
 Dit is de originele versie die je eventueel ook zelf kan aanpassen. Je hebt daarvoor nodig:
