@@ -36,7 +36,7 @@ Hoe het programma kan worden gedownload en er mee kan worden gewerkt wordt in de
 Deze versie heeft wat code betreft niets met de Python-versie te maken. De werking ervan is wel min of meer gelijk aan de Python-versie. 
 Er wordt bij de HTML-versie van een ander taalmodel van OpenAI gebruik gemaakt: *text-davinci-003* in plaats van *gpt-3.5-turbo*. 
 De HTML-versie kan worden gedownload *(samen met 1 afbeelding)* en dan direct vanaf de computer in de browser worden geopend.
-Ook hier is weer een APi-key nodig om het te laten werken. 
+Ook hier is weer een API-key nodig om het te laten werken. 
 
 Een versie online is hier te vinden: https://leerhetsnel.nl/demo/SchoolGPT/
 
