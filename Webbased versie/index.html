@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SchoolGPT</title>
+	
+	<style>
+      #info {
+        background-color: #eee;
+        padding: 10px;
+        margin-bottom: 10px;
+        display: none; /* div standaard verborgen */
+      }
+
+      #infoknop {
+        display: block;
+        margin-bottom: 10px;
+      }
+	  
+	  #werking {
+        background-color: #eee;
+        padding: 10px;
+        margin-bottom: 10px;
+        display: none; /* div standaard verborgen */
+      }
+
+      #werkingknop {
+        display: block;
+        margin-bottom: 10px;
+      }
+    </style>
+
+   	
+    <script type="text/javascript">
+	
+		function toggleInfo() {
+			var mijnDiv = document.getElementById("info");
+			var knop = document.getElementById("infoknop");
+
+			if (mijnDiv.style.display != "block") {
+			  knop.textContent = "Verberg informatie";
+			  mijnDiv.style.display = "block";
+			} else {
+			  knop.textContent = "Toon informatie";
+			  mijnDiv.style.display = "none";
+			}
+		}
+		
+		function toggleWerking() {
+			var mijnDiv = document.getElementById("werking");
+			var knop = document.getElementById("werkingknop");
+
+			if (mijnDiv.style.display != "block") {
+			  knop.textContent = "Verberg werking";
+			  mijnDiv.style.display = "block";
+			} else {
+			  knop.textContent = "Toon werking";
+			  mijnDiv.style.display = "none";
+			}
+		}
+	
+		
+		let init_chat_gpt = "";
+		let init_vraag = "";
+		let vragen = [];
+		let prompt = ""
+		
+
+        function getAnswer() {			
+		
+			document.getElementById('loading-indicator').style.display = 'block';
+
+		
+            const apiKey = document.getElementById('api-key').value;
+			
+			if (!apiKey) {
+				alert('Voer een Api-key in van OpenAI.');
+				document.getElementById('loading-indicator').style.display = 'none';
+				return;
+			}
+			
+			// Haal de tekst voor de vraag uit het vak	
+			const tekst_voor_vragen = document.getElementById('tekst-voor-eerdere-vragen');
+			init_chat_gpt = tekst_voor_vragen.value
+			
+			// Haal de tekst voor de volgende vraag uit het vak	
+			const tekst_voor_de_vraag = document.getElementById('tekst-voor-de-vraag');
+			init_vraag = tekst_voor_de_vraag.value
+			
+			
+            const questionInput = document.getElementById('question');
+            const question = questionInput.value;
+
+            // Clear the question input field
+            questionInput.value = '';
+			
+			const answerTextarea = document.getElementById('answer-textarea');
+			answerTextarea.value += '\n' + question + "\n";				
+				
+
+            // Add the question to the array
+			vragen.push(question);
+
+            // If the array is longer than 3, remove the oldest question
+			if (vragen.length > 6) {
+				vragen.shift();
+			}
+			
+				
+			
+			const vragenString = vragen.join(' ');
+			//console.log(vragenString);
+			
+			prompt = `${init_chat_gpt} ${vragenString} ${init_vraag} ${question}\nA:`
+			console.log(prompt)		
+
+            fetch("https://api.openai.com/v1/completions", {
+              method: "POST",
+              headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                  "model": "text-davinci-003",
+                  "prompt": `${init_chat_gpt} ${vragenString} ${init_vraag} ${question}\nA:`,
+                  "temperature": 1,
+                  "max_tokens": 500,
+                  "top_p": 1,
+                  "frequency_penalty": 0.0,
+                  "presence_penalty": 0.0,
+                  "stop": ["\n"]
+                })
+              }
+            )
+            .then(response => response.json())
+            .then(data => {
+                const answer = data.choices[0].text.trim();
+                const answerTextarea = document.getElementById('answer-textarea');
+                answerTextarea.value += '\n' + answer + "\n";
+				var textarea = document.getElementById('answer-textarea');
+				textarea.scrollTop = textarea.scrollHeight;
+                document.getElementById('question-container').style.display = 'block';
+				document.getElementById('loading-indicator').style.display = 'none';
+				vragen.push(answer)
+				const inputField = document.getElementById('question');
+				inputField.focus();
+            })
+            .catch(error => {
+                console.error(error);
+                const answerTextarea = document.getElementById('answer-textarea');
+                answerTextarea.value += '\n' + "Er ging iets verkeerd... (Is ChatGPT overbelast? Is het de juiste API key?)" + "\n";
+				var textarea = document.getElementById('answer-textarea');
+				textarea.scrollTop = textarea.scrollHeight;
+                document.getElementById('question-container').style.display = 'block';
+				document.getElementById('loading-indicator').style.display = 'none';
+				const inputField = document.getElementById('question');
+				inputField.focus();
+            });
+            document.getElementById('question-container').style.display = 'none';
+			
+			var textarea = document.getElementById('answer-textarea');
+			textarea.scrollTop = textarea.scrollHeight;
+			
+			
+        }
+		
+		
+        
+		document.addEventListener("DOMContentLoaded", function() {			
+		
+			// Add event listener to the question input element
+			document.getElementById('question').addEventListener('keypress', function(e) {
+				if (e.key === 'Enter') {
+					getAnswer();
+				}
+			});
+			
+			const tekst_voor_vragen = document.getElementById('tekst-voor-eerdere-vragen');
+			tekst_voor_vragen.value = "Je bent een chatbot die antwoord geeft op vragen van leerlingen in het basisonderwijs. Hou in je antwoorden rekening met je doelgroep. Dit gesprek is tot nu toe gevoerd: ";
+			
+			const tekst_voor_de_vraag = document.getElementById('tekst-voor-de-vraag');
+			tekst_voor_de_vraag.value = "Geef nu een antwoord in de stijl van een leerkracht die tegen een kind op de basisschool praat op deze (vervolg)vraag. Als er rare, of groffe taal door leerling wordt gebruikt stop je het gesprek. Gebruik eenvoudige woorden. Ga niet allerlei levenslessen vertellen. Als gevraagd wordt om een (deel) van een werkstuk of andere tekst te schrijven doe je dat niet, maar leg je juist uit hoe de leerling het zelf kan doen. Schrijf dus ook geen voorbeeld ofzo voor een werkstuk of een deel daarvan, want dan doe je hetzelfde. Zeg bij rare of verkeerde vragen dat je niet kan antwoorden en leg uit waarom. Dit is de vraag:";
+			
+			
+		});
+
+    </script>
+	
+	
+</head>
+<body>
+    <h1>SchoolGPT</h1>
+	<font color="grey">
+	<h4><i>Een test met een kindvriendelijke schil om ChatGPT.</i></h4>
+	</font>	
+	<hr size="5" color="blue" noshade><br>
+	<label for="api-key">Vul hier de API-key in:</label>
+    <input type="text" size="4" autocomplete="off" id="api-key"><br><br>
+    <textarea readonly id="answer-textarea" rows="10" cols="80"></textarea><br><br>
+	<div id="question-container">
+		<label for="question">Stel hier de vraag aan SchoolGPT en druk op enter:</label><br>
+		<input type="text" size="82" maxlength="100" autocomplete="off" id="question"><br><br>
+	</div>	
+	<div id="loading-indicator" style="display:none;">
+		<img src="wait.gif" alt="Loading..." />
+	</div>
+	<br>
+	<hr size="5" color="blue" noshade>
+	<p>
+	<button id="infoknop" onclick="toggleInfo()">Toon informatie</button>
+	<div id="info">	
+		<p>Om deze demo-website te kunnen gebruiken heb je een API-key van OpenAI nodig. Die kan je op <a href="https://platform.openai.com/account/api-keys" target="_blank">deze pagina</a> aanmaken.<br>
+		Je hebt hiervoor wel een (gratis) OpenAI account nodig.<br>
+		<br>Deze website slaat de API-key <b>niet</b> op. Deel de API-key ook nooit met anderen.<br>
+		Kijk voor meer informatie over SchoolGPT op <a href="https://github.com/PBKoning/SchoolGPT" target="_blank">de GitHub-pagina</a>.
+		<br>
+		</p>		
+		<p>
+		<h5>
+		<i> Disclaimer: Deze site is uitsluitend bedoeld als testomgeving. Gebruik is op eigen risico.</i> </h5>
+		
+		</p>
+	</div>
+	</p>
+	
+	
+	<button id="werkingknop" onclick="toggleWerking()">Toon werking</button>
+	<div id="werking">	
+	
+		<h2>De werking van SchoolGPT: wat wordt er naar OpenAI gestuurd als vraag?</h2>
+		<p>Om SchoolGPT te laten werken wordt er niet zomaar "prompt" <i>(opdracht)</i>  naar OpenAI gestuurd.<br>
+		In plaats daarvan bestaat deze uit 4 onderdelen, waarvan alleen het laatste onderdeel de daadwerkelijk gestelde vraag is.<br><br>
+		Die onderdelen zijn:
+		<ol>
+			<li>Een stuk tekst waarin staat wat deze chatbot moet doen en dat het tot nu toe gevoerde gesprek nu volgt.</li>
+			<li>Het gesprek dat al gevoerd is, bestaande uit de laatste 3 vragen en antwoorden.</li>
+			<li>Een tekst met diverse opdrachten hoe de chatbot moet antwoorden, gevolg door "Dit is de vraag:"</li>
+			<li>De vraag die gesteld is door de gebruiker.</li> 
+		</ol>
+		Dit 4 onderdelen worden samengevoegd tot 1 lange tekst en dan naar OpenAI gestuurd, waarna er vervolgens een antwoord terug komt.		
+		</p>
+		<h3>Verander de variabelen en kijk wat er gebeurt.</h3>
+		<p>	
+		Je kan in de twee onderstaande tekstvakken de standaardteksten aanpassen die worden gebruikt door SchoolGPT.<br>
+		Stel dan nieuwe vragen en kijk hoe de antwoorden veranderen.<br><br>
+		<b>Tip!</b> Het werkt soms beter om de site eerst opnieuw te laden en dan de teksten aan te passen.<br>
+		Dan is het gesprek weer gewist en begint SchoolGPT "met een schone lei".<<br><br>	
+		<i>Let op! De aangepaste teksten worden niet opgeslagen en als je de site opnieuw laadt ben je ze kwijt!</i>
+		</p>
+		</p>
+		Onderdeel 1: Een stuk tekst waarin staat wat deze chatbot moet doen en dat het tot nu toe gevoerde gesprek nu volgt.<br>
+		<textarea id="tekst-voor-eerdere-vragen" rows="5" cols="80"></textarea><br><br>	
+		
+		Onderdeel 3: Een tekst met diverse opdrachten hoe de chatbot moet antwoorden, gevolg door "Dit is de vraag:"<br>
+		<textarea id="tekst-voor-de-vraag" rows="10" cols="80"></textarea><br><br>		
+		</p>
+	</div>
+	
+</body>
+
+</html>
